@@ -1,20 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# ⚽ FutbolAI
 
-# Run and deploy your AI Studio app
+**FutbolAI** es una aplicación web desarrollada por **Raúl Pérez Hinojal**, creada con **React + TypeScript**, que utiliza **Google AI Studio** para generar sesiones de entrenamiento de fútbol personalizadas.  
+El usuario puede escribir o hablar sobre lo que necesita entrenar, y la IA genera **planes completos con ejercicios, tiempos y diagramas visuales** del campo.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/drive/1n70FG-NJHearmz7VAYPNcsz4wDH76CVf
+## 🧠 Características principales
 
-## Run Locally
+- Generación de entrenamientos personalizados con inteligencia artificial.  
+- Sesiones adaptadas a diferentes objetivos: técnica, táctica, resistencia, definición, defensa, etc.  
+- Diagramas automáticos de los ejercicios en el campo.  
+- Exportación de sesiones a **PDF** o **imagen PNG**.  
+- Interfaz moderna y limpia desarrollada con **React + TypeScript**.  
+- Integración directa con **Google AI Studio** mediante API Key segura.  
 
-**Prerequisites:**  Node.js
+---
 
+## 🧩 Tecnologías utilizadas
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+| Tipo | Tecnología |
+|------|-------------|
+| Frontend | React + TypeScript |
+| IA | Google AI Studio |
+| Despliegue | Vercel / Netlify / GitHub Pages |
+| Estilos | TailwindCSS (opcional) |
+| Control de versiones | Git + GitHub |
+
+---
+
+## 🚀 Instalación y ejecución local
+
+1. **Clona el repositorio:**
+   ```bash
+   git clone https://github.com/perezhinojal/futbolai.git
