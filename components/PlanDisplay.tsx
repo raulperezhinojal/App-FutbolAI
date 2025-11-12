@@ -6,7 +6,7 @@ declare const jspdf: any;
 
 interface PlanDisplayProps {
   plan: string;
-  diagrams: string[] | null;
+  diagrams: Record<string, string> | null;
   isGeneratingDiagrams: boolean;
   onGenerateDiagrams: () => void;
   onReset: () => void;
@@ -24,62 +24,49 @@ export const PlanDisplay: React.FC<PlanDisplayProps> = ({ plan, diagrams, isGene
 
   const parsedPlan = useMemo(() => {
     const lines = plan.split('\n').filter(line => line.trim() !== '');
-    const sections: { title: string; content: (string | ParsedExercise)[] } = {
-      title: '',
-      content: [],
-    };
-    let currentSection = '';
+    if (lines.length === 0) return { title: '', content: [] };
+
+    const title = lines.shift() || 'Plan de Entrenamiento';
+    const content: (string | ParsedExercise)[] = [];
     let currentExercise: ParsedExercise | null = null;
-    let exerciseCounter = 0;
+    let inMainSection = false;
 
     for (const line of lines) {
-      if (line.startsWith('**Entrenamiento')) {
-        sections.title = line.replace(/\*\*/g, '');
-        continue;
-      }
-      if (line.startsWith('**Duración')) {
-         sections.content.push(line.replace(/\*\*/g, ''));
-         continue;
-      }
-      if (line.startsWith('**1️⃣') || line.startsWith('**2️⃣') || line.startsWith('**3️⃣')) {
-        const isMainSection = line.startsWith('**2️⃣');
-        currentSection = isMainSection ? 'main' : 'other';
-        
+      if (line.match(/^\d\./)) { // Is a section title like "1. Calentamiento"
         if (currentExercise) {
-          if (currentSection !== 'main' && diagrams) {
-             // This logic needs to be careful. Let's assume diagrams only apply to main.
-          }
-          sections.content.push(currentExercise);
+          content.push(currentExercise);
           currentExercise = null;
         }
-        sections.content.push(line.replace(/\*\*/g, ''));
+        content.push(line);
+        inMainSection = line.startsWith('2.');
         continue;
       }
-      if (line.startsWith('- **')) {
-        if (currentExercise) {
-          sections.content.push(currentExercise);
-        }
-        const title = line.replace(/- \*\*/g, '').replace(/\*\*:/g, '');
-        currentExercise = { 
-          title, 
-          description: '', 
-        };
-        if (currentSection === 'main' && diagrams && diagrams[exerciseCounter]) {
-            currentExercise.diagram = diagrams[exerciseCounter];
-            exerciseCounter++;
-        }
 
+      const separatorIndex = line.indexOf(':');
+      // It's an exercise if it has a colon and is not a duration line
+      if (separatorIndex > 0 && !line.toLowerCase().includes('duración total')) {
+        if (currentExercise) {
+          content.push(currentExercise);
+        }
+        const exTitle = line.substring(0, separatorIndex).trim();
+        const exDesc = line.substring(separatorIndex + 1).trim();
+        currentExercise = { title: exTitle, description: exDesc };
+        if (inMainSection && diagrams && diagrams[exTitle]) {
+          currentExercise.diagram = diagrams[exTitle];
+        }
       } else if (currentExercise) {
-        currentExercise.description += (currentExercise.description ? '\n' : '') + line.replace(/^- /, '');
-      } else if (!line.startsWith('- **') && line.startsWith('- ')){
-          sections.content.push(line);
+        currentExercise.description += '\n' + line;
+      } else {
+        content.push(line); // Duration line or other text
       }
     }
     if (currentExercise) {
-      sections.content.push(currentExercise);
+      content.push(currentExercise);
     }
-    return sections;
+
+    return { title, content };
   }, [plan, diagrams]);
+
 
   const handleExport = async (format: 'png' | 'pdf') => {
     if (!planRef.current || isExporting) return;
@@ -112,7 +99,6 @@ export const PlanDisplay: React.FC<PlanDisplayProps> = ({ plan, diagrams, isGene
       }
     } catch (error) {
       console.error('Error exporting plan:', error);
-      // Optionally, show an error message to the user
     } finally {
       setIsExporting(false);
     }
@@ -126,10 +112,10 @@ export const PlanDisplay: React.FC<PlanDisplayProps> = ({ plan, diagrams, isGene
           <h1 className="text-2xl md:text-3xl font-bold text-green-400 mb-2 text-center">{parsedPlan.title}</h1>
           {parsedPlan.content.map((item, index) => {
             if (typeof item === 'string') {
-              if (item.startsWith('1️⃣') || item.startsWith('2️⃣') || item.startsWith('3️⃣')) {
+              if (item.match(/^\d\./)) {
                   return <h2 key={index} className="text-xl md:text-2xl font-bold text-green-400 mt-6 mb-3">{item}</h2>;
               }
-              if(item.startsWith('Duración')) {
+              if(item.toLowerCase().startsWith('duración total')) {
                   return <p key={index} className="text-center text-gray-400 font-semibold mb-6">{item}</p>
               }
               return <p key={index} className="ml-4">{item}</p>;
@@ -168,7 +154,7 @@ export const PlanDisplay: React.FC<PlanDisplayProps> = ({ plan, diagrams, isGene
           </button>
         )}
 
-        {diagrams && (
+        {diagrams && Object.keys(diagrams).length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button onClick={() => handleExport('png')} disabled={isExporting} className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-transform duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:scale-100">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
