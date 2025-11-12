@@ -51,7 +51,7 @@ export const generateTrainingPlan = async (selections: Selections): Promise<stri
 
 export const generateDiagrams = async (planText: string): Promise<string[]> => {
   const prompt = `
-    Eres un experto diseñador de diagramas de entrenamiento de fútbol que se especializa en crear representaciones visuales claras en formato SVG.
+    Eres un experto diseñador de diagramas de entrenamiento de fútbol que se especializa en crear representaciones visuales claras y profesionales en formato SVG.
 
     Tarea:
     Analiza el siguiente plan de entrenamiento. Para CADA ejercicio descrito bajo "2️⃣ Entrenamiento principal", genera un diagrama en formato SVG. IGNORA los ejercicios de calentamiento y enfriamiento.
@@ -61,19 +61,22 @@ export const generateDiagrams = async (planText: string): Promise<string[]> => {
     ${planText}
     ---
 
-    Especificaciones para el SVG:
+    Especificaciones para el SVG (estilo profesional y claro, inspirado en diagramas tácticos de élite):
     1.  **Canvas**: Usa un viewBox="0 0 400 250".
-    2.  **Campo**: Un rectángulo verde como fondo: <rect width="400" height="250" fill="#2E7D32" stroke="#FFF" stroke-width="2" />.
-    3.  **Líneas**: Dibuja una línea de medio campo blanca.
-    4.  **Jugadores**: Usa círculos <circle cx="..." cy="..." r="8" />.
-        -   Jugadores principales/activos: fill="#FFFFFF" (blanco).
-        -   Asistentes/oponentes: fill="#FFEB3B" (amarillo).
-        -   Balón: Un círculo más pequeño (r="5") con fill="#FFA726" (naranja).
-    5.  **Movimientos**:
-        -   **Recorrido del jugador**: Flechas continuas de color blanco. Usa un <defs> para el arrowhead.
-        -   **Pase de balón**: Flechas discontinuas (stroke-dasharray="5,5") de color amarillo.
-    6.  **Texto**: Incluye el nombre del ejercicio en la esquina superior izquierda. <text x="10" y="20" font-family="sans-serif" font-size="14" fill="white">[Nombre del Ejercicio]</text>.
-    7.  **Claridad**: El diagrama debe ser simple, claro y fácil de entender.
+    2.  **Campo**: Un rectángulo verde vibrante como fondo: <rect width="400" height="250" fill="#4CAF50" />. Dibuja las líneas esenciales del campo en blanco (stroke="#FFF", stroke-width="2", fill="none"), como el área de penalti en un lado y la línea de medio campo. Por ejemplo: <path d="M 0 50 L 80 50 L 80 200 L 0 200 M 200 0 L 200 250" />.
+    3.  **Jugadores**: Representa a los jugadores con círculos <circle cx="..." cy="..." r="9" />.
+        -   Equipo 1 (atacantes/principales): fill="#42A5F5" (azul), stroke="#000" stroke-width="1".
+        -   Equipo 2 (defensores/asistentes): fill="#EF5350" (rojo), stroke="#000" stroke-width="1".
+        -   Comodines/Neutrales: fill="#FFEB3B" (amarillo), stroke="#000" stroke-width="1".
+    4.  **Material**:
+        -   **Balón**: Un círculo blanco (r="6") con borde negro (stroke="#000" stroke-width="1").
+        -   **Conos/Marcadores**: Pequeños triángulos de color naranja: <polygon points="x,y x+5,y-10 x+10,y" fill="#FF9800" />.
+    5.  **Movimientos** (usa <defs> para las puntas de flecha para que se vean bien y profesionales):
+        -   **Recorrido del jugador (sin balón)**: Flechas continuas, de color blanco o negro para que contrasten bien. stroke-width="2".
+        -   **Conducción del jugador (con balón)**: Flechas en zigzag o sinuosas, continuas, de color blanco. stroke-width="2".
+        -   **Pase de balón**: Flechas discontinuas, de color amarillo (#FFEB3B). stroke-width="2", stroke-dasharray="5,5".
+    6.  **Texto**: Incluye el nombre del ejercicio en la esquina superior izquierda. <text x="10" y="20" font-family="sans-serif" font-size="14" font-weight="bold" fill="white" style="text-shadow: 1px 1px 2px black;">[Nombre del Ejercicio]</text>.
+    7.  **Claridad y Profesionalismo**: Asegúrate de que los elementos no se superpongan de manera confusa. El diseño debe ser limpio y visualmente atractivo, como los que usaría un analista táctico profesional.
 
     Formato de Salida:
     Devuelve una única respuesta JSON. La respuesta debe contener un objeto con una única clave "diagrams". El valor de "diagrams" debe ser un array de strings, donde cada string es el código SVG completo para un ejercicio principal. El orden de los SVGs en el array debe corresponder exactamente al orden de los ejercicios en el plan.
