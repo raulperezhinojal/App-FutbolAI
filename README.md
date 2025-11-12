@@ -1,8 +1,3 @@
-Perfecto ⚽ Aquí tienes el **README completo en formato Markdown**, listo para copiar y pegar directamente en tu archivo `README.md`:
-
----
-
-````markdown
 # ⚽ FutbolAI
 
 **FutbolAI** es una aplicación web desarrollada por **Raúl Pérez Hinojal**, creada con **React + TypeScript**, que utiliza **Google AI Studio** para generar sesiones de entrenamiento de fútbol personalizadas.  
@@ -38,48 +33,43 @@ El usuario puede escribir o hablar sobre lo que necesita entrenar, y la IA gener
 1. **Clona el repositorio:**
    ```bash
    git clone https://github.com/perezhinojal/futbolai.git
-````
+Entra en el proyecto:
 
-2. **Entra en el proyecto:**
+cd futbolai
 
-   ```bash
-   cd futbolai
-   ```
-3. **Instala las dependencias:**
 
-   ```bash
-   npm install
-   ```
-4. **Crea un archivo `.env` en la raíz del proyecto:**
+Instala las dependencias:
 
-   ```
-   VITE_GOOGLE_API_KEY=tu_clave_de_google_ai
-   ```
-5. **Ejecuta la app en modo desarrollo:**
+npm install
 
-   ```bash
-   npm run dev
-   ```
-6. Abre en tu navegador:
-   👉 [http://localhost:5173](http://localhost:5173)
 
----
+Crea un archivo .env en la raíz del proyecto:
 
-## 🌐 Despliegue
+VITE_GOOGLE_API_KEY=tu_clave_de_google_ai
 
-Puedes desplegar esta app fácilmente con **Vercel**:
 
-1. Ve a [https://vercel.com](https://vercel.com)
-2. Conecta tu repositorio de GitHub
-3. Pulsa **Deploy**
-4. Obtendrás una URL como:
-   👉 `https://futbolai.vercel.app`
+Ejecuta la app en modo desarrollo:
 
----
+npm run dev
 
-## 🏗️ Estructura del proyecto
 
-```
+Abre en tu navegador:
+👉 http://localhost:5173
+
+🌐 Despliegue
+
+Puedes desplegar esta app fácilmente con Vercel:
+
+Ve a https://vercel.com
+
+Conecta tu repositorio de GitHub
+
+Pulsa Deploy
+
+Obtendrás una URL como:
+👉 https://futbolai.vercel.app
+
+🏗️ Estructura del proyecto
 futbolai/
 │
 ├── public/              # Archivos públicos
@@ -94,34 +84,32 @@ futbolai/
 ├── .env                 # Clave API de Google AI (no subir a GitHub)
 ├── package.json
 └── vite.config.ts
-```
 
----
+💬 Cómo funciona
 
-## 💬 Cómo funciona
+El usuario escribe o dice qué quiere entrenar (por ejemplo: “quiero mejorar los pases y la defensa”).
 
-1. El usuario escribe o dice qué quiere entrenar (por ejemplo: “quiero mejorar los pases y la defensa”).
-2. La IA analiza la petición y genera un plan completo:
+La IA analiza la petición y genera un plan completo:
 
-   * Calentamiento
-   * Ejercicios principales
-   * Enfriamiento
-3. Se pueden generar **diagramas visuales** de cada ejercicio en el campo.
-4. El usuario puede exportar el plan en **PDF o PNG** para imprimirlo o compartirlo.
+Calentamiento
 
----
+Ejercicios principales
 
-## 🧾 Licencia
+Enfriamiento
 
-Este proyecto está bajo la licencia **MIT**, por lo que puedes usarlo, modificarlo y compartirlo libremente.
+Se pueden generar diagramas visuales de cada ejercicio en el campo.
 
----
+El usuario puede exportar el plan en PDF o PNG para imprimirlo o compartirlo.
 
-## 👨‍💻 Autor
+🧾 Licencia
 
-**Desarrollado por:** Raúl Pérez Hinojal
-📧 **Correo:** [perezhinojal@gmail.com](mailto:perezhinojal@gmail.com)
-📸 **Instagram:** [@perezhinojal](https://instagram.com/perezhinojal)
-🌐 **GitHub:** [https://github.com/perezhinojal](https://github.com/perezhinojal)
+Este proyecto está bajo la licencia MIT, por lo que puedes usarlo, modificarlo y compartirlo libremente.
 
-```
+👨‍💻 Autor
+
+Desarrollado por: Raúl Pérez Hinojal
+📧 Correo: perezhinojal@gmail.com
+
+📸 Instagram: @perezhinojal
+
+🌐 GitHub: https://github.com/perezhinojal
