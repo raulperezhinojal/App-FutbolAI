@@ -1,0 +1,5 @@
+{
+  "name": "AI Soccer Coach",
+  "description": "An expert AI soccer coach that creates personalized training sessions based on user preferences for training type, difficulty, duration, and group size.",
+  "requestFramePermissions": []
+}
