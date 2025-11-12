@@ -48,7 +48,15 @@ export const PlanDisplay: React.FC<PlanDisplayProps> = ({ plan, diagrams, isGene
         if (currentExercise) {
           content.push(currentExercise);
         }
-        const exTitle = line.substring(0, separatorIndex).trim();
+        const rawTitle = line.substring(0, separatorIndex);
+        // Robustly clean the exercise title to match the key from the diagrams map.
+        // This logic must be identical to the cleaning logic in geminiService.ts.
+        const exTitle = rawTitle
+            .trim()
+            .replace(/^[\d\w][\.\)]\s*|^[*-]\s*/, '') // Remove list markers like "1. ", "- ", "a) "
+            .replace(/[*_`#~]/g, '') // Remove markdown emphasis
+            .trim();
+            
         const exDesc = line.substring(separatorIndex + 1).trim();
         currentExercise = { title: exTitle, description: exDesc };
         if (inMainSection && diagrams && diagrams[exTitle]) {
@@ -87,8 +95,9 @@ export const PlanDisplay: React.FC<PlanDisplayProps> = ({ plan, diagrams, isGene
         link.href = canvas.toDataURL('image/png');
         link.click();
       } else { // pdf
-        const { jsPDF } = jspdf;
+        // FIX: Define imgData from canvas before using it.
         const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = jspdf;
         const pdf = new jsPDF({
             orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
             unit: 'px',

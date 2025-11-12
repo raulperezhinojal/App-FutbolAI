@@ -77,7 +77,14 @@ const extractMainExercises = (planText: string): { name: string, description: st
     if (inMainSection) {
       const separatorIndex = trimmedLine.indexOf(':');
       if (separatorIndex > 0) {
-        const name = trimmedLine.substring(0, separatorIndex).trim();
+        const rawName = trimmedLine.substring(0, separatorIndex);
+        // Robustly clean the exercise name to remove markdown and list markers.
+        // This is crucial to ensure the name used for diagram generation matches the one used for lookup in the UI.
+        const name = rawName
+            .trim()
+            .replace(/^[\d\w][\.\)]\s*|^[*-]\s*/, '') // Remove list markers like "1. ", "- ", "a) "
+            .replace(/[*_`#~]/g, '') // Remove markdown emphasis
+            .trim();
         const description = trimmedLine.substring(separatorIndex + 1).trim();
         if (name && description) {
           exercises.push({ name, description });
@@ -103,9 +110,9 @@ export const generateDiagrams = async (planText: string): Promise<Record<string,
     Eres un experto diseñador de diagramas de entrenamiento de fútbol que se especializa en crear representaciones visuales claras y profesionales en formato SVG.
 
     Tarea:
-    Analiza la siguiente lista de ejercicios de fútbol. Para CADA ejercicio en la lista, genera un diagrama en formato SVG.
+    Analiza la siguiente lista de ejercicios de fútbol. Para CADA ejercicio, genera un diagrama en formato SVG. Es CRUCIAL que generes un diagrama para cada ejercicio y que los devuelvas EN EL MISMO ORDEN en que se te presentan.
 
-    Ejercicios para diagramar:
+    Ejercicios para diagramar (en orden):
     ---
     ${exercisesForPrompt}
     ---
@@ -128,19 +135,13 @@ export const generateDiagrams = async (planText: string): Promise<Record<string,
     7.  **Claridad y Profesionalismo**: Asegúrate de que los elementos no se superpongan de manera confusa. El diseño debe ser limpio y visualmente atractivo, como los que usaría un analista táctico profesional.
 
     Formato de Salida:
-    Devuelve una única respuesta JSON. La respuesta debe contener un objeto con una única clave "diagrams". El valor de "diagrams" debe ser un ARRAY de objetos. Cada objeto en el array representará un ejercicio y tendrá dos claves: "name" (el nombre EXACTO del ejercicio que te proporcioné) y "svg" (el código SVG completo). Asegúrate de que el valor de "name" coincida perfectamente con los nombres de la lista de ejercicios.
+    Devuelve una única respuesta JSON. La respuesta debe contener un objeto con una única clave "diagrams". El valor de "diagrams" debe ser un ARRAY de STRINGS, donde cada string es el código SVG completo para un ejercicio. El orden de los SVGs en el array DEBE CORRESPONDER EXACTAMENTE al orden de los ejercicios en la lista de entrada.
 
-    Ejemplo de salida JSON esperada:
+    Ejemplo de salida JSON esperada si se proporcionaron 2 ejercicios:
     {
       "diagrams": [
-        {
-          "name": "[Nombre del Ejercicio 1]",
-          "svg": "<svg viewBox='0 0 400 250'>...</svg>"
-        },
-        {
-          "name": "[Nombre del Ejercicio 2]",
-          "svg": "<svg viewBox='0 0 400 250'>...</svg>"
-        }
+        "<svg viewBox='0 0 400 250'>...</svg>",
+        "<svg viewBox='0 0 400 250'>...</svg>"
       ]
     }
   `;
@@ -156,23 +157,14 @@ export const generateDiagrams = async (planText: string): Promise<Record<string,
                 properties: {
                     diagrams: {
                         type: Type.ARRAY,
-                        description: "Un array de objetos, donde cada objeto representa un diagrama de ejercicio.",
+                        description: "Un array de strings, donde cada string es el código SVG de un diagrama. El orden debe coincidir con la lista de ejercicios de entrada.",
                         items: {
-                          type: Type.OBJECT,
-                          properties: {
-                            name: {
-                              type: Type.STRING,
-                              description: "El nombre del ejercicio."
-                            },
-                            svg: {
-                              type: Type.STRING,
-                              description: "El código SVG del diagrama."
-                            }
-                          },
-                          required: ["name", "svg"]
+                          type: Type.STRING,
+                          description: "El código SVG del diagrama."
                         }
                     }
-                }
+                },
+                required: ["diagrams"]
             }
         }
     });
@@ -180,17 +172,24 @@ export const generateDiagrams = async (planText: string): Promise<Record<string,
     const jsonText = response.text;
     const result = JSON.parse(jsonText);
     
-    if (result.diagrams && Array.isArray(result.diagrams)) {
-      const diagramsRecord: Record<string, string> = result.diagrams.reduce((acc, item) => {
-        if (item.name && item.svg) {
-          acc[item.name] = item.svg;
+    // Robustly map diagrams back to exercises by index, assuming the model respects the order.
+    // This is much more reliable than matching by name.
+    if (result.diagrams && Array.isArray(result.diagrams) && result.diagrams.length === mainExercises.length) {
+      const diagramsRecord: Record<string, string> = {};
+      mainExercises.forEach((exercise, index) => {
+        if (result.diagrams[index]) {
+          diagramsRecord[exercise.name] = result.diagrams[index];
         }
-        return acc;
-      }, {});
+      });
       return diagramsRecord;
     }
 
+    console.warn("Mismatch between number of exercises and generated diagrams or invalid format.", {
+        numExercises: mainExercises.length,
+        numDiagrams: result.diagrams?.length
+    });
     return {};
+
   } catch (error) {
     console.error("Error generating diagrams:", error);
     throw new Error("No se pudieron generar los diagramas.");
